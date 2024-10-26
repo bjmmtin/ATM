@@ -1,0 +1,11 @@
+hacker
+10
+8
+withdraw 5
+login foo
+login hacker
+withdraw 15
+deposit 20
+withdraw 15
+balance
+logout
