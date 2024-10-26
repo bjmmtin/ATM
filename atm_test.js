@@ -1,11 +1,6 @@
 const readline = require("readline");
 const fs = require("fs");
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 // State class
 class State {
     constructor(state) {
@@ -55,33 +50,29 @@ class ATM {
                 if (passed) {
                     this.balance = newBalance;
                     this.state = nextState;
+                    console.log(`Action: ${action}, Param: ${param}, Success: ${passed}, New State: ${this.state}, Balance: ${this.balance}`);
                     return [true, result];
                 }
             }
         }
+        console.log(`Action: ${action}, Param: ${param}, Success: false, State: ${this.state}, Balance: ${this.balance}`);
         return [false, null];
     }
 }
 
-// Helper function to get input and handle the ATM operations
+// Main function to handle input and output
 async function main() {
-    const input = [];
-    for await (const line of rl) {
-        input.push(line);
-        if (input.length > 2 && input.length - 3 === parseInt(input[2])) break;
-    }
-
-    rl.close();
-
-    const password = input[0];
-    const initialBalance = parseInt(input[1]);
+    const input = fs.readFileSync("input.txt", "utf8").split("\n");
+    
+    const password = input[0].trim();
+    const initialBalance = parseInt(input[1].trim());
     const atm = new ATM(unauthorized, initialBalance, password, transitionTable);
 
     const output = [];
-    const numQueries = parseInt(input[2]);
+    const numQueries = parseInt(input[2].trim());
 
     for (let i = 0; i < numQueries; i++) {
-        const [action, param] = input[i + 3].split(" ");
+        const [action, param] = input[i + 3].trim().split(" ");
         const paramValue = action === "deposit" || action === "withdraw" ? parseInt(param) : param;
 
         const [success, res] = atm.next(action, paramValue);
@@ -92,9 +83,8 @@ async function main() {
         }
     }
 
-    const outputPath = process.env.OUTPUT_PATH || "output.txt";
-    fs.writeFileSync(outputPath, output.join("\n"));
-    console.log("Output written to", outputPath);
+    fs.writeFileSync("output.txt", output.join("\n"));
+    console.log("Output written to output.txt");
 }
 
 // Run the program
